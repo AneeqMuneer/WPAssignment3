@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"> </script>
+	<title>Quadratic Equation Solver</title>
+
+    <style>
+        body {
+            text-align: center;
+            font-size: 16px;
+        }
+
+        form {
+            margin-top: 2rem;
+        }
+
+        label, input {
+            margin-bottom: 1rem;
+        }
+        
+        @media only screen and (max-width: 600px) {
+            body{
+                font-size: 1.5rem;
+            }
+
+            form{
+                margin-top: 2rem;
+            }
+
+            label, input{
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <h2><u>Quadratic Equation Solver</u></h2>
+        <form id="eqsol">
+            <label for="a">a:</label>
+            <input type="text" id="a" name="a" placeholder="Enter a">
+            <br>
+            <label for="b">b:</label>
+            <input type="text" id="b" name="b" placeholder="Enter b">
+            <br>
+            <label for="c">c:</label>
+            <input type="text" id="c" name="c" placeholder="Enter c">
+            <br>
+            <input type="button" id="findRootsButton" value="Find Roots">
+        </form>
+    </div>
+    
+
+    <script type="text/javascript">
+
+    class Imaginary{
+        constructor(a, b) {
+            this.real = a;
+            this.imag = b;
+        }
+    }
+
+    class EquationSolver{
+
+        constructor(a,b,c) {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+        }
+
+        async CalcDiscriminant() {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    let discriminant = this.b * this.b - 4 * this.a * this.c;
+                    resolve(discriminant);
+                }, 1000);
+            });
+        }
+
+        async CalcSecondPart() {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    let val = this.b * this.b - 4 * this.a * this.c;
+                    let secondpart = Math.sqrt(val);
+                    resolve(secondpart);
+                }, 1000);
+            });
+        }
+
+        async CalcNumenator1(secondpart) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    let val = (this.b * -1) + secondpart;
+                    resolve(val);
+                }, 1000);
+            });
+        }
+
+        async CalcNumenator2(secondpart) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    let val = (this.b * -1) - secondpart;
+                    resolve(val);
+                }, 1000);
+            });
+        }
+
+        async CalcDenominator() {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    let val = 2 * this.a;
+                    resolve(val);
+                }, 1000);
+            });
+        }
+
+        async FindRoots() {
+            let discriminant = await this.CalcDiscriminant();
+            if(discriminant > 0){
+                let parttwo = await this.CalcSecondPart();
+                let num1 = await this.CalcNumenator1(parttwo);
+                let num2 = await this.CalcNumenator2(parttwo);
+                let den = await this.CalcDenominator();
+
+                let root1 = num1 / den;
+                let root2 = num2 / den;
+
+                console.log(root1)
+                console.log(root2)
+                return [root1 , root2];
+            }
+            else if(discriminant == 0){
+                let den = await this.CalcDenominator();
+
+                let root1 = (this.b * -1) / den;
+                let root2 = root1;
+
+                console.log(root1)
+                console.log(root2)
+                return [root1 , root2];
+            }
+            else{
+                let den = await this.CalcDenominator();
+                let disc = await this.CalcDiscriminant();
+                let real = (this.b * -1) / den;
+                let imag = (Math.sqrt(Math.abs(disc))) / den;
+
+                let root1 = new Imaginary(real , imag);
+                let root2 = new Imaginary(real , -1 * imag);
+
+                console.log(root1)
+                console.log(root2)
+                return [root1 , root2];
+            }
+        }
+    }
+
+    document.getElementById('findRootsButton').addEventListener('click', async function() {
+    let a = document.getElementById('a').value;
+    let b = document.getElementById('b').value;
+    let c = document.getElementById('c').value;
+
+    let equation = new EquationSolver(a, b, c);
+
+    let roots = await equation.FindRoots();
+    
+    let newheading = document.createElement('h2');
+    newheading.innerText = "Equation Roots";
+
+    let root1Input = document.createElement('input');
+    root1Input.type = 'text';
+    root1Input.readOnly = true;
+    if (typeof roots[0] === 'object') {
+        root1Input.value = roots[0].real + '+' + roots[0].imag + 'ℹ'
+    }
+    else{
+        root1Input.value = roots[0];
+    }
+
+    let root2Input = document.createElement('input');
+    root2Input.type = 'text';
+    root2Input.readOnly = true;
+    if (typeof roots[0] === 'object') {
+        root2Input.value = roots[1].real + '-' + (-1 * roots[1].imag) + 'ℹ'
+    }
+    else{
+        root2Input.value = roots[1];
+    }
+
+    let newForm = document.createElement('form');
+    newForm.id = 'rootsForm';
+    newForm.appendChild(document.createTextNode('Root 1: '));
+    newForm.appendChild(root1Input);
+    newForm.appendChild(document.createElement('br'));
+    newForm.appendChild(document.createTextNode('Root 2: '));
+    newForm.appendChild(root2Input);
+
+    document.getElementById('container').innerHTML = '';
+    document.getElementById('container').appendChild(newheading);
+    document.getElementById('container').appendChild(newForm);
+    });
+
+    </script>
+
+</body>
+</html>
